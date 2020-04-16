@@ -9,6 +9,7 @@ const path = require('path');
 // Lib stuff
 const inquirer = require('./lib/inquirer');
 const next = require('./lib/nextSetup');
+const addScripts = require('./lib/addScripts');
 
 clear();
 
@@ -40,8 +41,25 @@ const runProcess = async () => {
 		.replace(/\s/g, '-');
 
 	if (tech === 'Next.js') {
-		await next.runInstallation(projectName);
-		console.log('Now we do the next bit');
+		try {
+			await next.runInstallation(projectName);
+			await addScripts(projectName, [
+				{
+					key: 'dev',
+					value: 'next',
+				},
+				{
+					key: 'build',
+					value: 'next build',
+				},
+				{
+					key: 'start',
+					value: 'next start',
+				},
+			]);
+		} catch (err) {
+			console.error(err);
+		}
 	} else {
 		console.log('Nothing yet.');
 	}
