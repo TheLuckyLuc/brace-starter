@@ -1,26 +1,14 @@
-const { exec: execWithCallback } = require('child_process');
-const { promisify } = require('util');
-const exec = promisify(execWithCallback);
 const chalk = require('chalk');
 const figlet = require('figlet');
 const clear = require('clear');
-const path = require('path');
 
 // Lib stuff
 const inquirer = require('./lib/inquirer');
 const next = require('./lib/nextSetup');
 const addScripts = require('./lib/addScripts');
+const gitInitialise = require('./lib/git');
 
 clear();
-
-// figlet.fonts(function (err, fonts) {
-// 	if (err) {
-// 		console.log('something went wrong...');
-// 		console.dir(err);
-// 		return;
-// 	}
-// 	console.dir(fonts);
-// });
 
 console.log(
 	chalk.yellow(
@@ -42,7 +30,10 @@ const runProcess = async () => {
 
 	if (tech === 'Next.js') {
 		try {
+			// Let's add all the Next.js stuff
 			await next.runInstallation(projectName);
+
+			// Now let's add the starter scripts to the package.json
 			await addScripts(projectName, [
 				{
 					key: 'dev',
@@ -57,8 +48,13 @@ const runProcess = async () => {
 					value: 'next start',
 				},
 			]);
+
+			// Lastly let's initialise a git repo and make the first commit
+			gitInitialise(projectName);
 		} catch (err) {
-			console.error(err);
+			// Let's make sure we exit the process if we encounter an error
+			console.error(`Setup error: ${err}`);
+			process.exit(1);
 		}
 	} else {
 		console.log('Nothing yet.');
