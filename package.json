@@ -1,7 +1,9 @@
 {
 	"name": "brace-starter",
-	"version": "1.0.0",
-	"main": "index.js",
+	"version": "1.0.4",
+	"bin": {
+		"brace-starter": "index.js"
+	},
 	"dependencies": {
 		"chalk": "^4.0.0",
 		"clear": "^0.1.0",
