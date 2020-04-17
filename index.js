@@ -57,7 +57,7 @@ const runProcess = async () => {
 			await next.buildFolderStructure(projectName, styledComponents);
 
 			// Lastly let's initialise a git repo and make the first commit
-			gitInitialise(projectName);
+			await gitInitialise(projectName);
 		} catch (err) {
 			// Let's make sure we exit the process if we encounter an error
 			console.error(`Setup error: ${err}`);
