@@ -7,8 +7,8 @@ const clear = require('clear');
 // Lib stuff
 const inquirer = require('./lib/inquirer');
 const next = require('./lib/nextSetup');
-const addScripts = require('./lib/addScripts');
-const gitInitialise = require('./lib/git');
+const packageJSON = require('./lib/packageJSON');
+const git = require('./lib/git');
 
 clear();
 
@@ -16,7 +16,7 @@ console.log(
 	chalk.yellow(
 		figlet.textSync('Brace Starter', {
 			font: 'ANSI Shadow',
-			horizontalLayout: 'full',
+			horizontalLayout: 'fitted',
 		})
 	)
 );
@@ -24,11 +24,13 @@ console.log(
 const runProcess = async () => {
 	const { project: unsanitised, tech } = await inquirer.starterQuestions();
 
-	// Sanitise the input name by removing any special characters apart from hyphens & underscores. Then replace multiple occurences of spaces with one space & replace it with a dash, so it's in a safe format for the package.json name.
+	// Sanitises the input so it suits the package.json naming convention. If I find a cleaner way to write this, I'll be sure to tidy it up. Does the trick for now.
 	const projectName = unsanitised
-		.replace(/[^-0-9A-Za-z_ ]/g, '')
-		.replace(/\s{2,}/g, ' ')
-		.replace(/\s/g, '-');
+		.toLowerCase()
+		.replace(/[^-0-9A-Za-z_ ]/g, '') // Removes any characters apart from alphanumeric characters, hyphens or underscores
+		.replace(/\s{2,}/g, ' ') // Replaces repeated spaces with just one space
+		.replace(/^\s*(\S.*\S)\s*$/, '$1') // Removes any leading or trailing spaces
+		.replace(/\s/g, '-'); // Finally replaces spaces with hyphens
 
 	if (tech === 'Next.js') {
 		try {
@@ -38,7 +40,7 @@ const runProcess = async () => {
 			await next.runInstallation(projectName, styledComponents);
 
 			// Now let's add the starter scripts to the package.json
-			await addScripts(projectName, [
+			await packageJSON.addScripts(projectName, [
 				{
 					key: 'dev',
 					value: 'next',
@@ -57,14 +59,28 @@ const runProcess = async () => {
 			await next.buildFolderStructure(projectName, styledComponents);
 
 			// Lastly let's initialise a git repo and make the first commit
-			await gitInitialise(projectName);
+			await git.initialise(projectName, tech);
 		} catch (err) {
 			// Let's make sure we exit the process if we encounter an error
 			console.error(`Setup error: ${err}`);
 			process.exit(1);
 		}
-	} else {
-		console.log("This feature hasn't been built yet. Sowwy :(");
+	}
+
+	if (tech === 'React Skeleton') {
+		try {
+			// Clone the React Skeleton repo
+			await git.clone(projectName);
+
+			// Rename the package.json name to the project directory
+			await packageJSON.renameFile(projectName);
+
+			// Initialise new git repo
+			await git.initialise(projectName, tech);
+		} catch (err) {
+			console.error(`Setup error: ${err}`);
+			process.exit(1);
+		}
 	}
 };
 
