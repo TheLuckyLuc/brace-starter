@@ -1,6 +1,6 @@
 {
 	"name": "brace-starter",
-	"version": "1.0.4",
+	"version": "1.0.7",
 	"bin": {
 		"brace-starter": "index.js"
 	},

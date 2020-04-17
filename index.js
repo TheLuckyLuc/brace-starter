@@ -22,7 +22,7 @@ console.log(
 );
 
 const runProcess = async () => {
-	const { project: unsanitised, tech } = await inquirer.askQuestions();
+	const { project: unsanitised, tech } = await inquirer.starterQuestions();
 
 	// Sanitise the input name by removing any special characters apart from hyphens & underscores. Then replace multiple occurences of spaces with one space & replace it with a dash, so it's in a safe format for the package.json name.
 	const projectName = unsanitised
@@ -32,8 +32,10 @@ const runProcess = async () => {
 
 	if (tech === 'Next.js') {
 		try {
+			const { styledComponents } = await inquirer.nextQuestions();
+
 			// Let's add all the Next.js stuff
-			await next.runInstallation(projectName);
+			await next.runInstallation(projectName, styledComponents);
 
 			// Now let's add the starter scripts to the package.json
 			await addScripts(projectName, [
@@ -51,6 +53,9 @@ const runProcess = async () => {
 				},
 			]);
 
+			// Build the initial folder structure
+			await next.buildFolderStructure(projectName, styledComponents);
+
 			// Lastly let's initialise a git repo and make the first commit
 			gitInitialise(projectName);
 		} catch (err) {
@@ -59,7 +64,7 @@ const runProcess = async () => {
 			process.exit(1);
 		}
 	} else {
-		console.log('Nothing yet.');
+		console.log("This feature hasn't been built yet. Sowwy :(");
 	}
 };
 
