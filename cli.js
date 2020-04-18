@@ -1,14 +1,20 @@
 #!/usr/bin/env node
 
+const path = require('path');
+
 const chalk = require('chalk');
 const figlet = require('figlet');
 const clear = require('clear');
+const fs = require('fs-extra');
 
 // Lib stuff
 const inquirer = require('./lib/inquirer');
 const next = require('./lib/nextSetup');
 const packageJSON = require('./lib/packageJSON');
 const git = require('./lib/git');
+const createConstants = require('./lib/createConstants');
+
+const wpInstall = require('./wp/scripts/index');
 
 clear();
 
@@ -21,16 +27,8 @@ console.log(
 	)
 );
 
-const runProcess = async () => {
-	const { project: unsanitised, tech } = await inquirer.starterQuestions();
-
-	// Sanitises the input so it suits the package.json naming convention. If I find a cleaner way to write this, I'll be sure to tidy it up. Does the trick for now.
-	const projectName = unsanitised
-		.toLowerCase()
-		.replace(/[^-0-9A-Za-z_ ]/g, '') // Removes any characters apart from alphanumeric characters, hyphens or underscores
-		.replace(/\s{2,}/g, ' ') // Replaces repeated spaces with just one space
-		.replace(/^\s*(\S.*\S)\s*$/, '$1') // Removes any leading or trailing spaces
-		.replace(/\s/g, '-'); // Finally replaces spaces with hyphens
+(async () => {
+	const { projectName, tech } = await inquirer.starterQuestions();
 
 	if (tech === 'Next.js') {
 		try {
@@ -82,6 +80,60 @@ const runProcess = async () => {
 			process.exit(1);
 		}
 	}
-};
 
-runProcess();
+	if (tech === 'WordPress') {
+		try {
+			await createConstants(projectName);
+
+			const {
+				php,
+				mysqlUser,
+				mysqlPass,
+				mysqlHost,
+				mysqlPort,
+				dbName,
+				dbUser,
+				dbPass,
+				dbPort,
+				url,
+				title,
+				admin,
+				adminPassword,
+				adminEmail,
+			} = await inquirer.wordpressQuestions();
+
+			await fs.writeJson(
+				path.join(__dirname, 'wp', 'config.json'),
+				{
+					php,
+					mysql_ROOT: {
+						user: mysqlUser,
+						pass: mysqlPass,
+						host: mysqlHost,
+						port: mysqlPort,
+					},
+					wp: {
+						db: {
+							name: dbName,
+							user: dbUser,
+							pass: dbPass,
+							host: mysqlHost,
+							port: dbPort,
+						},
+						url,
+						title,
+						admin,
+						adminPassword,
+						adminEmail,
+					},
+				},
+				{ spaces: 4 }
+			);
+
+			wpInstall();
+		} catch (err) {
+			console.error(`Setup error: ${err}`);
+			process.exit(1);
+		}
+	}
+})();
