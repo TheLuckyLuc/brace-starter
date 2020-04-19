@@ -14,8 +14,6 @@ Install.prototype.add = function (step) {
 };
 
 Install.prototype.run = async function (noUndo) {
-	const { INSTALL_DIR } = require('../constants.json');
-
 	if (!(await this.start())) {
 		await this.end();
 		return;

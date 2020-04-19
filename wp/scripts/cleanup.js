@@ -18,7 +18,7 @@ const remove = util.promisify(fs.remove);
 				'config-sample.json',
 				'cli.js',
 				'lib',
-				'nextFiles',
+				'next',
 				'.gitignore',
 				'package.json',
 				'package-lock.json',

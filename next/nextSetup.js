@@ -1,32 +1,24 @@
+// Native
 const path = require('path');
-const fs = require('fs-extra');
 const { promisify } = require('util');
 const childProcess = require('child_process');
 const exec = promisify(childProcess.exec);
+
+// NPM
+const fs = require('fs-extra');
+const chalk = require('chalk');
 const CLI = require('clui');
 const Spinner = CLI.Spinner;
-const chalk = require('chalk');
+
+// Local
+const copyFiles = require('../lib/copyFiles');
+const promisifySpawn = require('../lib/promisifySpawn');
+const pong = require('../lib/spinner');
 
 const currentDirectory = process.cwd();
 
-// Lib stuff
-const copyFiles = require('./copyFiles');
-const promisifySpawn = require('./promisifySpawn');
-const pong = require('./spinner');
-
 module.exports = {
 	runInstallation: async (projectName, styledComponents) => {
-		if (fs.existsSync(projectName)) {
-			console.log(
-				`${chalk.red('The directory')} "${chalk.blueBright(
-					projectName
-				)}" ${chalk.red(
-					'already exists! Please try again with a different name.'
-				)}`
-			);
-			process.exit(1);
-		}
-
 		const status = new Spinner('Creating directory... ', pong);
 		status.start();
 
@@ -85,7 +77,7 @@ module.exports = {
 
 		if (styledComponents === 'Yes') {
 			await copyFiles(
-				path.join(__dirname, '../', 'nextFiles'),
+				path.join(__dirname, '../', 'next', 'files'),
 				path.join(currentDirectory, projectName),
 				['.babelrc']
 			);
@@ -94,7 +86,7 @@ module.exports = {
 		}
 
 		await copyFiles(
-			path.join(__dirname, '../', 'nextFiles'),
+			path.join(__dirname, '../', 'next', 'files'),
 			path.join(currentDirectory, projectName, 'pages'),
 			pageFiles
 		);

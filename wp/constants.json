@@ -1,0 +1,10 @@
+{
+    "PROJECT_NAME": "gonna-work-betch",
+    "ROOT_DIR": "D:\\Dropbox\\Personal Projects\\brace-starter",
+    "INSTALL_DIR": "D:\\Dropbox\\Personal Projects\\brace-starter\\gonna-work-betch",
+    "WP_TEMP_ZIP": "wp.zip",
+    "WP_DOWNLOAD_ENDPOINT": "https://en-gb.wordpress.org/latest-en_GB.zip",
+    "WP_CLI_NAME": "wp-cli.phar",
+    "WP_CLI_CONFIG_NAME": "wp-cli.yml",
+    "WP_CLI_DOWNLOAD_ENDPOINT": "https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar"
+}

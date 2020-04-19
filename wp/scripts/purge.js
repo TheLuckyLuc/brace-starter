@@ -2,7 +2,7 @@ const Install = require('../utilities/Install');
 
 (async () => {
 	try {
-		const options = require('../../config.json');
+		const options = require('../config.json');
 
 		const install = new Install(options);
 
