@@ -2,11 +2,15 @@ const path = require('path');
 
 const execute = require('../utilities/execute');
 
-const { INSTALL_DIR, WP_CLI_NAME } = require('../constants.json');
-
 module.exports = {
 	name: 'install-wordpress',
 	apply: async (installer) => {
+		const {
+			INSTALL_DIR,
+			WP_CLI_NAME,
+			PROJECT_NAME,
+		} = require('../constants.json');
+
 		await execute(
 			installer.options.php,
 			[
@@ -19,6 +23,7 @@ module.exports = {
 				`--admin_password=${installer.options.wp.adminPassword}`,
 				`--admin_email=${installer.options.wp.adminEmail}`,
 				'--skip-email=1',
+				`--path=${PROJECT_NAME}`,
 			],
 			true
 		);

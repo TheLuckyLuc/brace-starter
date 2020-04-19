@@ -6,20 +6,18 @@ const path = require('path');
 const execute = require('../utilities/execute');
 const fileExists = require('../utilities/fileExists');
 
-const writeFile = util.promisify(fs.writeFile);
 const remove = util.promisify(fs.remove);
-
-const {
-	WP_CLI_DOWNLOAD_ENDPOINT,
-	INSTALL_DIR,
-	WP_CLI_NAME,
-	WP_CLI_CONFIG_NAME,
-	ROOT_DIR,
-} = require('../constants.json');
 
 module.exports = {
 	name: 'get-wp-cli',
 	apply: async (installer) => {
+		const {
+			WP_CLI_DOWNLOAD_ENDPOINT,
+			INSTALL_DIR,
+			WP_CLI_NAME,
+			WP_CLI_CONFIG_NAME,
+		} = require('../constants.json');
+
 		await new Promise((resolve, reject) => {
 			request({
 				uri: WP_CLI_DOWNLOAD_ENDPOINT,
@@ -42,12 +40,18 @@ module.exports = {
 		/**
 		 * Create wp-cli configuration file
 		 */
-		await writeFile(
+		await fs.outputFile(
 			path.join(INSTALL_DIR, WP_CLI_CONFIG_NAME),
-			`path: ${ROOT_DIR}\n`
+			`path: ${INSTALL_DIR}\n`
 		);
 	},
 	undo: async (installer) => {
+		const {
+			INSTALL_DIR,
+			WP_CLI_NAME,
+			WP_CLI_CONFIG_NAME,
+		} = require('../constants.json');
+
 		const items = [
 			path.join(INSTALL_DIR, WP_CLI_NAME),
 			path.join(INSTALL_DIR, WP_CLI_CONFIG_NAME),

@@ -2,10 +2,10 @@ const argv = require('yargs').argv;
 
 const Install = require('../utilities/Install');
 
-const options = require('../config.json');
-
 module.exports = async () => {
 	try {
+		const options = require('../config.json');
+
 		const install = new Install(options);
 
 		install.add(require('../steps/load-php'));
@@ -24,15 +24,15 @@ module.exports = async () => {
 		install.add(require('../steps/wordpress-clean-tables'));
 		install.add(require('../steps/wordpress-settings'));
 
-		install.add({
-			name: 'Throw Error',
-			apply: async () => {
-				await new Promise((resolve) =>
-					setTimeout(() => resolve(), 5000)
-				);
-				throw new Error("I've fallen and I can't get up!");
-			},
-		});
+		// install.add({
+		// 	name: 'Throw Error',
+		// 	apply: async () => {
+		// 		await new Promise((resolve) =>
+		// 			setTimeout(() => resolve(), 5000)
+		// 		);
+		// 		throw new Error("I've fallen and I can't get up!");
+		// 	},
+		// });
 
 		await install.run(argv._.includes('no-undo'));
 	} catch (err) {

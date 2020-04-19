@@ -102,6 +102,8 @@ console.log(
 				adminEmail,
 			} = await inquirer.wordpressQuestions();
 
+			await fs.mkdirp(projectName);
+
 			await fs.writeJson(
 				path.join(__dirname, 'wp', 'config.json'),
 				{

@@ -1,7 +1,5 @@
 const chalk = require('chalk');
 
-const { INSTALL_DIR } = require('../constants.json');
-
 const Install = function (options) {
 	this.options = options || {};
 
@@ -16,6 +14,8 @@ Install.prototype.add = function (step) {
 };
 
 Install.prototype.run = async function (noUndo) {
+	const { INSTALL_DIR } = require('../constants.json');
+
 	if (!(await this.start())) {
 		await this.end();
 		return;
@@ -56,9 +56,6 @@ Install.prototype.run = async function (noUndo) {
 	console.log('--------');
 
 	console.log(chalk.green('Mission was a success'));
-	console.log(chalk.yellow(`You can now (and probably should)`));
-	console.log(chalk.yellow('delete the install directory:'));
-	console.log(chalk.yellow(`"rm -rf ${INSTALL_DIR}"`));
 
 	await this.end();
 };

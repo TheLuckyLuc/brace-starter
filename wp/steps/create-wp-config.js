@@ -9,8 +9,6 @@ const fileExists = require('../utilities/fileExists');
 
 const remove = util.promisify(fs.remove);
 
-const { INSTALL_DIR, WP_CLI_NAME, ROOT_DIR } = require('../constants.json');
-
 module.exports = {
 	name: 'create-wp-config',
 	first: async (installer) => {
@@ -32,6 +30,12 @@ module.exports = {
 		]);
 	},
 	apply: async (installer) => {
+		const {
+			INSTALL_DIR,
+			WP_CLI_NAME,
+			PROJECT_NAME,
+		} = require('../constants.json');
+
 		await execute(
 			installer.options.php,
 			[
@@ -47,12 +51,15 @@ module.exports = {
 						: ''
 				}`,
 				'--skip-check=1',
+				`--path=${PROJECT_NAME}`,
 			],
 			true
 		);
 	},
 	undo: async (installer) => {
-		const items = [path.join(ROOT_DIR, 'wp-config.php')];
+		const { INSTALL_DIR } = require('../constants.json');
+
+		const items = [path.join(INSTALL_DIR, 'wp-config.php')];
 
 		for (let item of items) {
 			const exists = await fileExists(item);

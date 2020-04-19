@@ -17,4 +17,4 @@
 
 ### To run it
 
-> No need to clone the repo. Simply run `npx brace-starter` & follow the prompts.
+> No need to run npm install. Simply run `npx brace-starter` & follow the prompts.

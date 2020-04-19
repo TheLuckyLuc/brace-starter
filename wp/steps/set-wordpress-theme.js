@@ -7,17 +7,17 @@ const fileExists = require('../utilities/fileExists');
 
 const copy = util.promisify(fs.copy);
 
-const { ROOT_DIR, INSTALL_DIR, WP_CLI_NAME } = require('../constants.json');
-
 module.exports = {
 	name: 'set-wordpress-theme',
 	first: async (installer) => {
+		const { INSTALL_DIR } = require('../constants.json');
+
 		if (!installer.options.wp.theme) {
 			return;
 		}
 
 		installer.themePath = path.join(
-			ROOT_DIR,
+			INSTALL_DIR,
 			'wp-content',
 			'themes',
 			installer.options.wp.theme
@@ -30,6 +30,8 @@ module.exports = {
 		}
 	},
 	apply: async (installer) => {
+		const { INSTALL_DIR, WP_CLI_NAME } = require('../constants.json');
+
 		if (!installer.options.wp.theme) {
 			return;
 		}

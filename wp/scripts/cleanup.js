@@ -5,19 +5,33 @@ const path = require('path');
 const readdir = util.promisify(fs.readdir);
 const remove = util.promisify(fs.remove);
 
-const ROOT_DIR = path.resolve(__dirname, '../');
-const INSTALL_DIR = __dirname;
-
 (async () => {
-    const items = await readdir(ROOT_DIR);
-    for (let item of items) {
-        if (['.git', 'install', 'config.json', 'config-sample.json'].includes(item)) {
-            continue;
-        }
+	const { INSTALL_DIR } = require('../constants.json');
 
-        await remove(path.join(ROOT_DIR, item));
-    }
+	const items = await readdir(INSTALL_DIR);
+	for (let item of items) {
+		if (
+			[
+				'.git',
+				'install',
+				'config.json',
+				'config-sample.json',
+				'cli.js',
+				'lib',
+				'nextFiles',
+				'.gitignore',
+				'package.json',
+				'package-lock.json',
+				'README.md',
+				'wp',
+			].includes(item)
+		) {
+			continue;
+		}
 
-    await remove(path.join(INSTALL_DIR, 'wp-cli.phar'));
-    await remove(path.join(INSTALL_DIR, 'wp-cli.yml'));
+		await remove(path.join(INSTALL_DIR, item));
+	}
+
+	await remove(path.join(INSTALL_DIR, 'wp-cli.phar'));
+	await remove(path.join(INSTALL_DIR, 'wp-cli.yml'));
 })();
