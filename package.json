@@ -17,7 +17,6 @@
 		"lodash": "^4.17.15",
 		"mysql": "^2.18.1",
 		"request": "^2.88.2",
-		"rimraf": "^3.0.2",
 		"simple-git": "^1.132.0",
 		"validator": "^13.0.0",
 		"yargs": "^15.3.1"
