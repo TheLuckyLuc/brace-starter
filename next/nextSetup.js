@@ -18,7 +18,7 @@ const pong = require('../lib/spinner');
 const currentDirectory = process.cwd();
 
 module.exports = {
-	runInstallation: async (projectName, styledComponents) => {
+	runInstallation: async (projectName, { styledComponents, tailwind }) => {
 		const status = new Spinner('Creating directory... ', pong);
 		status.start();
 
@@ -31,25 +31,43 @@ module.exports = {
 
 		status.message('Installing required dependencies... ');
 
-		const arguments = ['i', '--save', 'next', 'react', 'react-dom'];
+		const dependencies = ['i', '--save', 'next', 'react', 'react-dom'];
 
-		if (styledComponents === 'Yes') {
-			arguments.push('styled-components');
+		if (styledComponents) {
+			dependencies.push('styled-components');
 		}
 
 		await promisifySpawn(
 			/^win/.test(process.platform) ? 'npm.cmd' : 'npm',
-			arguments,
+			dependencies,
 			{
 				cwd: path.join(currentDirectory, projectName),
 				stdio: 'inherit',
 			}
 		);
 
-		if (styledComponents === 'Yes') {
+		let devDependencies = ['i', '--save-dev'];
+
+		if (styledComponents) {
+			devDependencies = devDependencies.concat([
+				'babel-plugin-styled-components',
+			]);
+		}
+
+		if (tailwind) {
+			devDependencies = devDependencies.concat([
+				'@fullhuman/postcss-purgecss',
+				'postcss-preset-env',
+				'tailwindcss',
+			]);
+		}
+
+		if (styledComponents || tailwind) {
+			status.message('Installing required devDependencies now... ');
+
 			await promisifySpawn(
 				/^win/.test(process.platform) ? 'npm.cmd' : 'npm',
-				['i', '--save-dev', 'babel-plugin-styled-components'],
+				devDependencies,
 				{
 					cwd: path.join(currentDirectory, projectName),
 					stdio: 'inherit',
@@ -66,24 +84,63 @@ module.exports = {
 		);
 	},
 
-	buildFolderStructure: async (projectName, styledComponents) => {
+	buildFolderStructure: async (
+		projectName,
+		{ styledComponents, tailwind }
+	) => {
 		const status = new Spinner('Building folder structure... ', pong);
 
 		status.start();
 
 		await fs.mkdirp(path.join(currentDirectory, projectName, 'pages'));
+		await fs.mkdirp(path.join(currentDirectory, projectName, 'styles'));
 
+		let rootFiles = [];
 		let pageFiles = ['index.js'];
 
-		if (styledComponents === 'Yes') {
-			await copyFiles(
-				path.join(__dirname, '../', 'next', 'files'),
-				path.join(currentDirectory, projectName),
-				['.babelrc']
-			);
-
+		if (styledComponents && tailwind) {
+			rootFiles = rootFiles.concat(['.babelrc', 'postcss.config.js']);
 			pageFiles = pageFiles.concat(['_app.js', '_document.js']);
 		}
+
+		if (styledComponents && !tailwind) {
+			rootFiles = rootFiles.concat(['.babelrc']);
+			pageFiles = pageFiles.concat(['_app.js', '_document.js']);
+		}
+
+		if (!styledComponents && tailwind) {
+			rootFiles = rootFiles.concat(['postcss.config.js']);
+
+			await fs.copy(
+				path.join(
+					__dirname,
+					'../',
+					'next',
+					'files',
+					'tailwind',
+					'_app.js'
+				),
+				path.join(currentDirectory, projectName, 'pages', '_app.js')
+			);
+
+			await fs.copy(
+				path.join(
+					__dirname,
+					'../',
+					'next',
+					'files',
+					'tailwind',
+					'index.css'
+				),
+				path.join(currentDirectory, projectName, 'styles', 'index.css')
+			);
+		}
+
+		await copyFiles(
+			path.join(__dirname, '../', 'next', 'files'),
+			path.join(currentDirectory, projectName),
+			rootFiles
+		);
 
 		await copyFiles(
 			path.join(__dirname, '../', 'next', 'files'),

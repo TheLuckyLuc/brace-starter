@@ -1,12 +1,12 @@
 ## Brace Starter
 
-### Prerequisites
+### Before you start anything
 
-> -   Make sure you have Node.js & npm installed. Your npm needs to be at least version `5.2`
+> -   Make sure you have Node.js & npm installed. Your npm needs to be at least version `5.2`, so you can run the `npx` command
 
 ### Prerequisites - WordPress
 
-> -   MySQL Server. Obviously.
+> -   MySQL Server
 > -   PHP binary path
 
 ### Prerequisites - Next.js/React Skeleton
